@@ -227,14 +227,27 @@
         });
 
     // 下载文件的函数
-    function downloadFile(url, fileName) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName; // 设置下载文件的名称
-        document.body.appendChild(a); // 将a标签添加到文档中
-        a.click(); // 触发点击事件，开始下载
-        document.body.removeChild(a); // 下载完成后移除a标签
+function downloadFile(url, fileName) {
+    // 创建隐藏的可下载链接
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    document.body.appendChild(a);
+
+    // 设置链接的href属性为文件的URL，并设置download属性指定下载的文件名
+    a.href = url;
+    a.download = fileName;
+
+    // 如果浏览器支持HTML5 download属性，则使用它来触发下载
+    if ('download' in a) {
+        a.click();
+    } else {
+        // 否则，对于不支持download属性的老式浏览器，尝试使用window.open
+        window.open(url);
     }
+
+    // 移除链接元素
+    document.body.removeChild(a);
+}
 </script>
 </body>
 </html>
