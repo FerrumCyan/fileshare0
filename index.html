@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <title>加载中... </title>
+    <link rel="shortcut icon" href="/logo.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+        }
+
+        .top-bar {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+
+        .top-bar a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 5px 10px;
+            transition: background-color 0.5s ease-in-out;
+        }
+
+        .top-bar a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .top-bar .logo a {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            display: flex;
+            align-items: center;
+            border: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            font-size: 12px;
+            display: none;
+            position: absolute;
+            background-color: #f8f8f8;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            backdrop-filter: blur(5px);
+            border: none; 
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .main-content {
+            padding: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            width: 100%;
+            bottom: -60px;
+            left: 0;
+            color: #bbb;
+            transition: bottom 0.3s ease-in-out, color 0.3s ease-in-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .footer a {
+            color: #bbb;
+            text-decoration: none;
+        }
+
+        .footer:hover {
+            bottom: 0;
+            color: #333;
+        }
+
+        .footer:hover a {
+            color: rgb(0,0,255);
+        }
+
+        .file-info {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            width: 500px;
+            max-width: 100%; /* Ensure it fits on smaller screens */
+            text-align: center;
+        }
+
+        .file-info h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+
+        .file-info p {
+            font-size: 18px;
+            color: #777;
+            margin: 5px 0 0;
+        }
+
+        .file-info button {
+            padding: 12px 24px;
+            background-color: #298191;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+        }
+
+        .file-info button:hover {
+            color: #333;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo">
+            <a href="">冰珠分享文件分享页面</a>
+        </div>
+        <div class="nav-menu">
+            <a href="" class="nav-button">频道的YouTube</a>
+            <a href="" class="nav-button">频道的哔哩哔哩</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="file-info">
+            <h2 id="file-name">加载中... </h2>
+            <button id="download-button">下载</button>
+        </div>
+    </div>
+    <div class="footer">
+    鸣谢：软件开发者制作的优秀软件、123云盘提供的直链、FSL1提供UI源代码与免费二级域名、您对“冰珠分享”频道的关注<br/>注意：此频道仅在YouTube、哔哩哔哩上更新，如果在其他平台上看见“冰珠分享”频道的视频，请举报或向我们反馈，谢谢！
+    </div>
+<script>
+    const fileNameElement = document.getElementById('file-name');
+    const downloadButton = document.getElementById('download-button');
+    const filesInfoUrl = './json.json'; // 确保路径正确
+
+    // 解析URL参数中的id
+    const params = new URLSearchParams(window.location.search);
+    const fileId = params.get('id');
+
+    // 从服务器获取文件信息
+    fetch(filesInfoUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // 解析JSON
+        })
+        .then(files => {
+            const file = files.find(file => file.id === fileId);
+            if (file) {
+                // 更新页面标题
+                document.title = `${file.displayName} | 冰珠分享文件分享`;
+
+                // 更新文件信息
+                fileNameElement.textContent = file.displayName;
+
+                // 设置下载按钮的点击事件
+                downloadButton.onclick = () => downloadFile(file.url, file.displayName);
+            } else {
+                // 文件ID不存在，重定向到/404.html
+                window.location.href = '/404.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // 处理其他错误，重定向到/404.html
+            window.location.href = '/404.html';
+        });
+
+    // 下载文件的函数
+    function downloadFile(url, fileName) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName; // 设置下载文件的名称
+        document.body.appendChild(a); // 将a标签添加到文档中
+        a.click(); // 触发点击事件，开始下载
+        document.body.removeChild(a); // 下载完成后移除a标签
+    }
+</script>
+</body>
+</html>
